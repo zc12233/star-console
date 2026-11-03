@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>星图控制台 · Demo</title>
+  <link rel="stylesheet" href="../runtime/panel.css" />
+  <style>
+    html, body { margin: 0; height: 100%; background: #04060c; color: #e8ecf1; font-family: system-ui, sans-serif; }
+  </style>
+</head>
+<body>
+  <script src="./sample-data.js"></script>
+  <script>
+    // 只读演示：把 Host 的接口替换成示例数据，其余请求一律拒绝。
+    (function () {
+      function reply(obj, status) {
+        return Promise.resolve({
+          ok: (status || 200) < 400,
+          status: status || 200,
+          json: function () { return Promise.resolve(obj); }
+        });
+      }
+      window.fetch = function (url) {
+        var u = String(url);
+        if (u.indexOf('/star-console/api/bootstrap') >= 0) return reply(window.DEMO_BOOT);
+        if (u.indexOf('/star-console/api/status') >= 0) return reply(window.DEMO_STATUS);
+        if (u.indexOf('/star-console/api/voices') >= 0) return reply({ ok: true, voices: [] });
+        if (u.indexOf('/diary/state') >= 0) return reply(window.DEMO_DIARY);
+        return reply({ ok: false, error: 'demo: 只读演示，接口未实现' }, 404);
+      };
+    })();
+  </script>
+  <script src="../runtime/panel.js"></script>
+  <script>
+    // 演示页自动打开控制台
+    setTimeout(function () {
+      var btn = document.querySelector('.bfc-launcher');
+      if (btn) btn.click();
+    }, 200);
+  </script>
+</body>
+</html>
